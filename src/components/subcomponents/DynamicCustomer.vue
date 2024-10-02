@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col justify-center items-center gap-4">
+    <div class="flex flex-col justify-center items-center gap-2">
         <!-- Icons -->
         <div class="flex flex-row justify-around items-center">
             <div v-for="icon in displayedIcons" :key="icon.name" class="w-6 h-6">
