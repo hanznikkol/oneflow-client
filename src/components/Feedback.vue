@@ -22,10 +22,13 @@
                 <label for="feedback" class="text-xs">Tell us what you like and what we could improve</label>
                 <textarea 
                     id="feedback"
+                    v-model = "feedback"
                     rows="6"
                     class="text-xs w-full h-full flex-1 p-2 rounded-lg placeholder:text-label-gray placeholder:italic resize-none border-2 border-primary"
-                    placeholder="Write your experience..." />
-
+                    placeholder="Write your experience..." 
+                    @input="updateCharCount"    
+                />
+                <small class="text-xs text-label-gray">{{ charCount }}/1000</small>
             </div>
             <div class="w-full h-auto flex flex-row gap-2">
                 <ButtonContainer
@@ -54,4 +57,12 @@ import ReactionContainer from './subcomponents/ReactionContainer.vue';
 import ButtonContainer from './icons/ButtonContainer.vue';
 
 const userReaction = ref('');
+const feedback = ref('')
+const charCount = ref(0); // Character count
+const updateCharCount = () => {
+  if (feedback.value.length > 1000) {
+    feedback.value = feedback.value.substring(0, 1000); // Limit input
+  }
+  charCount.value = feedback.value.length; // Update character count
+};
 </script>
