@@ -1,5 +1,7 @@
 <template>
-    <div class="flex flex-col justify-center items-center gap-4">
+    <div class="flex flex-col justify-center items-center gap-2">
+        <!-- Admin Type -->
+        <p class="text-xs">Cashier</p>
         <!-- Current Queue -->
         <h3 class="font-bold text-xl">C-14</h3>
         <!-- Estimated Time -->

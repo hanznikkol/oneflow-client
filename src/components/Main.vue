@@ -88,7 +88,7 @@ import IconProceed from './icons/IconProceed.vue';
 import IconOK from './icons/IconOK.vue';
 const selectedService = ref('priority')
 
-const progress = "Proceed"
+const progress = "Waiting"
 
 const serviceItems = [
     'Tuition Payment',
