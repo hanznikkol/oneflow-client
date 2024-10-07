@@ -5,7 +5,7 @@ import Feedback from './components/Feedback.vue';
 
 <template>
     <div class="font-inter">
-       <Feedback />
+       <RouterView />
     </div>
 </template>
 
