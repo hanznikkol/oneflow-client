@@ -6,7 +6,7 @@ import FeedbackComplete from './components/FeedbackComplete.vue';
 
 <template>
     <div class="font-inter">
-       <Main />
+       <RouterView />
     </div>
 </template>
 

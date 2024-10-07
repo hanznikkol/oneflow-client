@@ -27,12 +27,12 @@ import IconPriority3 from '../icons/IconPriority3.vue';
 import IconRegularCustomer from '../icons/IconRegularCustomer.vue';
 
 const icons = {
-    priority: [
+    Priority: [
         {name: 'IconPriority1', component: IconPriority1},
         {name: 'IconPriority2', component: IconPriority2},
         {name: 'IconPriority3', component: IconPriority3},
     ],
-    regular: [
+    Regular: [
         {name: 'IconRegular', component: IconRegularCustomer},
     ]
 }
@@ -54,9 +54,9 @@ const displayedIcons = computed(() => {
 
 const customerLabel = computed(() => {
     switch (props.serviceType){
-        case 'priority':
+        case 'Priority':
             return 'Priority Customer'
-        case 'regular':
+        case 'Regular':
             return 'Regular Customer'
         default:
             return ''
