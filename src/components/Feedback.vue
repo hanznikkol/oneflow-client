@@ -17,7 +17,7 @@
                 </div>
 
                 <!-- Animated -->
-                <div ref="lottieContainer" class="w-24 h-24 flex justify-end  items-center"></div>
+                <div ref="lottieContainer" class="w-24 h-24 flex justify-end items-center"></div>
             </div>
 
             <!-- Reaction Buttons -->

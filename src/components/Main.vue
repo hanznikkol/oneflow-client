@@ -1,6 +1,6 @@
 <template>
     <Feedback v-if="ticket.ticketID && ticket.status === 'Completed'" :ticketID = "ticket.ticketID"></Feedback>
-    <div v-if="ticket.ticketID && ticket.status === 'Pending'" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl py-10 px-12 md:px-14 md:py-16 overflow-y-auto">
+    <div v-if="ticket.ticketID && ticket.status === 'Open'" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl py-10 px-12 md:px-14 md:py-16 overflow-y-auto">
         <div class="flex flex-col justify-center items-center w-full min-h-full gap-4 ">
             <!-- Dynamic Icons, Customer and Service Label -->
             <div :class= "ticket.status === 'Completed' ? 'hidden' : 'h-auto w-full block'"
@@ -22,7 +22,7 @@
                 <!-- Main Queue Content -->
                 <div v-if="ticket.status === 'Open' || ticket.status === 'Hold'" class="flex flex-col justify-around items-center w-full h-full ">
                     <!-- Label -->
-                    <h1 class="font-bold text-xl">Current Queue:</h1>
+                    <h1 class="font-bold text-xl text-custom-orange">Current Queue:</h1>
 
                     <!-- Queues -->
                     <div class="w-full h-auto flex flex-row items-center justify-around">
@@ -64,10 +64,9 @@
             <!-- Announcement -->
             <div class="w-full h-full flex flex-col items-center justify-center">
                 <h1 class="font-bold text-lg">Thank you for waiting!</h1>
-                <!-- Image -->
-                <div class="w-28 h-28 flex justify-center p-4">
-                    <component class="w-full h-full" :is="IconAnnounce"/>
-                </div>
+                <!-- Animation -->
+                <div ref="lottieContainer" class="w-30 h-24 flex justify-end items-center "></div>
+
                 <!-- Label -->
                 <div class="flex">
                     <p class="text-center text-sm font-semibold ">We are having our lunch break in 12 minutes</p>
@@ -79,14 +78,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, nextTick} from 'vue';
+import Lottie from 'lottie-web';
 //Icons
 import TicketFrame from './icons/TicketFrame.vue';
+//JSON
+import announcementAnimation from '../assets/lottieJSON/announcement.json'
 //Components
 import DynamicCustomer from './subcomponents/DynamicCustomer.vue';
 import QueueCurrentItems from './subcomponents/QueueCurrentItems.vue';
-//Icons
-import IconAnnounce from './icons/IconAnnounce.vue';
 import IconProceed from './icons/IconProceed.vue';
 import IconOK from './icons/IconOK.vue';
 import Feedback from './Feedback.vue'
@@ -99,6 +99,8 @@ const ticket = computed(() => ticketData.value.ticket || {})
 
 const router = useRouter()
 const route = useRoute()
+
+const lottieContainer = ref(null)
 
 const getCounterName = (service) => {
     const counter = service.adminType === 'C' ? 'Cashier' : service.adminType === 'R' ? 'Registrar' : 'Admission'
@@ -170,8 +172,8 @@ const onCompleteTicket = (completeTicket, adminType) => {
     }
 }
 
-
 onMounted(async () => {
+  
     if(!route.query.tc || route.query.tc === undefined) return 
 
     // fetch client ticket if code is provided 
@@ -181,6 +183,17 @@ onMounted(async () => {
         socket.on('holdTicket', onHoldTicket)
         socket.on('completeTicket', onCompleteTicket)
     }
+
+    await nextTick();
+    //Lottie
+    Lottie.loadAnimation({
+        container: lottieContainer.value, // the ref to attach the animation
+        renderer: 'svg',                  // specify the renderer (svg, canvas, html)
+        loop: true,                       // animation loops indefinitely
+        autoplay: true,                   // start playing on load
+        animationData: announcementAnimation    // the JSON animation data
+    });
+    
 })
 
 onUnmounted(()=> {
@@ -188,8 +201,6 @@ onUnmounted(()=> {
     socket.off('holdTicket')
     socket.off('completeTicket')
 })
-
-
 
 
 </script>
