@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full min-h-svh flex items-center justify-center m-auto lg:max-w-xl px-12 py-14 md:px-20 md:py-24 overflow-y-auto">
+    <div class="w-full min-h-svh flex items-center justify-center m-auto lg:max-w-xl px-12 py-14 md:px-16 md:py-20 overflow-y-auto">
         <div class="flex flex-col items-center justify-center w-full flex-1 shadow-2xl rounded-lg p-6 gap-6">
             <!-- Icon -->
             <div class="w-full h-auto flex justify-center">

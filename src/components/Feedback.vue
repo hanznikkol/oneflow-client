@@ -38,7 +38,7 @@
                     sizeClass = "p-3 w-full"
                     bgColorClass = "bg-pure-white hover:bg-light-gray"
                     buttonRadius = "rounded-md"
-                    outlineClass = "outline outline-1"
+                    outlineClass = "border border-1"
                     text = "No Thanks"
                 />
                 <ButtonContainer

@@ -1,10 +1,10 @@
 <template>
-    <div class="w-full flex flex-row justify-start items-center gap-2 lg:gap-4">
+    <div class="w-full flex flex-row justify-start items-center gap-3">
       <!-- (Very Bad) -->
       <div class="transition-colors duration-300 " @click = "toggleReaction('Very Bad')">
         <component
           :is="reaction === 'Very Bad' ? IconVeryBadFill : IconVeryBadStroke"
-          class="w-5 h-5"
+          class="w-7 h-7"
         />
       </div>
 
@@ -12,7 +12,7 @@
       <div class="transition-colors duration-300 " @click = "toggleReaction('Bad')">
         <component
           :is="reaction === 'Bad' ? IconBadFill : IconBadStroke"
-          class="w-5 h-5"
+          class="w-7 h-7"
         />
       </div>
 
@@ -20,7 +20,7 @@
       <div class="transition-colors duration-300 " @click = "toggleReaction('Neutral')">
         <component
           :is="reaction === 'Neutral' ? IconNeutralFill : IconNeutralStroke"
-          class="w-5 h-5"
+          class="w-7 h-7"
         />
       </div>
 
@@ -28,7 +28,7 @@
       <div class="transition-colors duration-300 " @click ="toggleReaction('Good')">
         <component
           :is="reaction === 'Good' ? IconGoodFill : IconGoodStroke"
-          class="w-5 h-5"
+          class="w-7 h-7"
         />
       </div>
 
@@ -36,7 +36,7 @@
       <div class="transition-colors duration-300 " @click = "toggleReaction('Very Good')">
         <component
           :is="reaction === 'Very Good' ? IconVeryGoodFill : IconVeryGoodStroke"
-          class="w-5 h-5"
+          class="w-7 h-7"
         />
       </div>
     </div>
