@@ -2,16 +2,22 @@
     <!-- Feedback Complete -->
     <FeedbackComplete v-if="showCompleted"></FeedbackComplete>
     <div v-if="!showCompleted" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl px-12 py-14 md:px-20 md:py-24 overflow-y-auto">
-        <div class="flex flex-col items-center justify-between w-full flex-1 shadow-2xl rounded-lg p-6 gap-6">
+        <div class="flex flex-col items-center justify-between w-full flex-1 shadow-2xl rounded-lg p-6 gap-4">
             <!-- Logo -->
             <div class=" w-full flex justify-start">
                 <img class="w-20 h-10" src="/src/assets/images/LogoONEFlow.png"/>
             </div>
-
+                
             <!-- Text -->
-            <div class="flex flex-col w-full gap-1">
-                <h1 class="text-lg font-bold">Give Feedback</h1>
-                <p class="text-xs">How was your queue experience?</p>
+            <div class="w-full h-auto flex flex-row gap-2 ">
+                <!-- Header Label -->
+                <div class="flex flex-col justify-center h-full w-full gap-1 ">
+                    <h1 class="text-lg font-bold">Give Feedback</h1>
+                    <p class="text-xs">How was your queue experience?</p>
+                </div>
+
+                <!-- Animated -->
+                <div ref="lottieContainer" class="w-24 h-24 flex justify-end  items-center"></div>
             </div>
 
             <!-- Reaction Buttons -->
@@ -56,6 +62,8 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
+import Lottie from 'lottie-web';
+import feedbackAnimation from '../assets/lottieJSON/feedback.json'
 import ReactionContainer from './subcomponents/ReactionContainer.vue';
 import ButtonContainer from './icons/ButtonContainer.vue';
 import FeedbackComplete from './FeedbackComplete.vue';
@@ -64,6 +72,18 @@ const props = defineProps({
     ticketID: {
         type: Number
     }
+})
+
+const lottieContainer = ref(null)
+
+onMounted(() => {
+    Lottie.loadAnimation({
+    container: lottieContainer.value, // the ref to attach the animation
+    renderer: 'svg',                  // specify the renderer (svg, canvas, html)
+    loop: true,                       // animation loops indefinitely
+    autoplay: true,                   // start playing on load
+    animationData: feedbackAnimation    // the JSON animation data
+  });
 })
 
 const showCompleted = ref(false)
