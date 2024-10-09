@@ -1,6 +1,6 @@
 <template>
     <Feedback v-if="ticket.ticketID && ticket.status === 'Completed'" :ticketID = "ticket.ticketID"></Feedback>
-    <div v-if="ticket.ticketID && ticket.status === 'Pending'" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl py-10 px-12 md:px-14 md:py-16 overflow-y-auto">
+    <div v-if="ticket.ticketID && ticket.status === 'Open'" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl py-10 px-12 md:px-14 md:py-16 overflow-y-auto">
         <div class="flex flex-col justify-center items-center w-full min-h-full gap-4 ">
             <!-- Dynamic Icons, Customer and Service Label -->
             <div :class= "ticket.status === 'Completed' ? 'hidden' : 'h-auto w-full block'"
