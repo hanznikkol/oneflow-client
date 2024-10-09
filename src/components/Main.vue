@@ -1,5 +1,6 @@
 <template>
-    <div v-if="ticket.ticketID" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl py-10 px-12 md:px-14 md:py-16 overflow-y-auto">
+    <Feedback v-if="ticket.ticketID && ticket.status === 'Completed'" :ticketID = "ticket.ticketID"></Feedback>
+    <div v-if="ticket.ticketID && ticket.status === 'Pending'" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl py-10 px-12 md:px-14 md:py-16 overflow-y-auto">
         <div class="flex flex-col justify-center items-center w-full min-h-full gap-4 ">
             <!-- Dynamic Icons, Customer and Service Label -->
             <div :class= "ticket.status === 'Completed' ? 'hidden' : 'h-auto w-full block'"
@@ -43,7 +44,7 @@
                     <!-- Text -->
                     <div class="w-full h-auto flex flex-col items-center justify-center">
                         <p class="text-xs">It's your turn</p>
-                        <h1 class="font-bold">Proceed to {{ `${getCounterName(ticket.services?.find(s=>s.processedBy))} `}}</h1>
+                        <h1 class="font-bold">Proceed to {{ `${getCounterName(ticket.services?.find(s=>s.processedBy && (s.status != 'Completed' && s.status != 'Abandoned')))} `}}</h1>
                     </div>
                 </div>
 
@@ -88,6 +89,7 @@ import QueueCurrentItems from './subcomponents/QueueCurrentItems.vue';
 import IconAnnounce from './icons/IconAnnounce.vue';
 import IconProceed from './icons/IconProceed.vue';
 import IconOK from './icons/IconOK.vue';
+import Feedback from './Feedback.vue'
 import { useRoute, useRouter } from 'vue-router';
 import { socket, state } from '../../socket';
 const selectedService = computed(() => ticket.value.customerType ? ticket.value.customerType : 'N/A')
@@ -155,18 +157,15 @@ const onHoldTicket = (heldTicket, adminType) => {
 const onCompleteTicket = (completeTicket, adminType) => {
     // get the called ticket number
     const ticketNumber = `${completeTicket.adminType}-${completeTicket.ticketNumber}`
-    console.log(ticketNumber)
     // update the counter
     const servingTicket = ticketData.value.currentServingTickets.find(t => t.adminType == adminType)
     if(servingTicket) {
-        console.log('in')
         servingTicket['Current Serving'] = '...'
         const currTicketNumber = `${ticket.value.adminType}-${ticket.value.ticketNumber}`
         if(ticketNumber === currTicketNumber){
             // replace the current serving ticket with the new called ticket
             ticketData.value.ticket = completeTicket
             const completed = completeTicket.services.every(s => s.status === 'Completed' || s.status === 'Abandoned')
-            if(completed) router.push('/queue-view/feedback')
         }
     }
 }
@@ -177,9 +176,7 @@ onMounted(async () => {
 
     // fetch client ticket if code is provided 
     ticketData.value = await getTicket(route.query.tc)
-    console.log(ticketData.value)
     if(ticketData.value){
-        if(ticket.value.status === 'Completed') return router.replace('/queue-view/feedback')
         socket.on('callTicket', onCallTicket)
         socket.on('holdTicket', onHoldTicket)
         socket.on('completeTicket', onCompleteTicket)

@@ -1,5 +1,7 @@
 <template>
-    <div class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl px-12 py-14 md:px-20 md:py-24 overflow-y-auto">
+    <!-- Feedback Complete -->
+    <FeedbackComplete v-if="showCompleted"></FeedbackComplete>
+    <div v-if="!showCompleted" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl px-12 py-14 md:px-20 md:py-24 overflow-y-auto">
         <div class="flex flex-col items-center justify-between w-full flex-1 shadow-2xl rounded-lg p-6 gap-6">
             <!-- Logo -->
             <div class=" w-full flex justify-start">
@@ -41,6 +43,7 @@
                 />
                 <ButtonContainer
                     text = "Send"
+                    @click="handleAddFeedback"
                     textClass = "text-sm text-black font-bold"
                     sizeClass = "p-3 w-full"
                     buttonRadius = "rounded-md"
@@ -52,10 +55,18 @@
 </template> 
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import ReactionContainer from './subcomponents/ReactionContainer.vue';
 import ButtonContainer from './icons/ButtonContainer.vue';
+import FeedbackComplete from './FeedbackComplete.vue';
 
+const props = defineProps({
+    ticketID: {
+        type: Number
+    }
+})
+
+const showCompleted = ref(false)
 const userReaction = ref('');
 const feedback = ref('')
 const charCount = ref(0); // Character count
@@ -65,4 +76,54 @@ const updateCharCount = () => {
   }
   charCount.value = feedback.value.length; // Update character count
 };
+
+
+const addFeedback = async(ticketID) => {
+    try{
+        const request = `/api/feedbacks`
+        const response = await fetch(request, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }, 
+            body: JSON.stringify({ticketID: ticketID, reaction: userReaction.value, feedback: feedback.value})
+        })
+        const data = await response.json()
+        if(!response.ok) return alert(data.error)
+        return data.created
+    }
+    catch(err){
+        console.error(err)
+    }
+}
+
+const getExistingFeedback = async(ticketID) => {
+    try{
+        const request = `/api/feedbacks/${ticketID}`
+        const response = await fetch(request, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        const data = await response.json()
+        if(!response.ok) return alert(data.error)
+        return data.feedback
+    }
+    catch(err){
+        console.error(err)
+    }
+}
+
+const handleAddFeedback = async () => {
+    const created = await addFeedback(props.ticketID)
+    if(created) showCompleted.value = true
+}
+
+onMounted(async() => {
+    const existingFeedback = await getExistingFeedback(props.ticketID)
+    console.log(existingFeedback)
+    if(existingFeedback) showCompleted.value = true;
+})
+
 </script>
