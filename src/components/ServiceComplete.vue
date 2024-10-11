@@ -1,6 +1,6 @@
 <template>
     <div class="w-full min-h-screen flex justify-center items-center p-4 ">
-        <div ref="lottieContainer" class="w-50 h-50"></div>
+        <div ref="lottieContainer" class="w-50 h-50 lg:w-44 lg:h-44"></div>
     </div>
 </template>
 

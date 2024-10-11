@@ -1,5 +1,6 @@
 <template>
     <!-- Feedback Complete -->
+    <ServiceComplete v-if="showServiceComplete && !showCompleted" />
     <FeedbackComplete v-if="showCompleted"></FeedbackComplete>
     <div v-if="!showCompleted" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl px-12 py-14 md:px-20 md:py-24 overflow-y-auto">
         <div class="flex flex-col items-center justify-between w-full flex-1 shadow-2xl rounded-lg p-6 gap-4">
@@ -67,6 +68,9 @@ import feedbackAnimation from '../assets/lottieJSON/feedback.json'
 import ReactionContainer from './subcomponents/ReactionContainer.vue';
 import ButtonContainer from './icons/ButtonContainer.vue';
 import FeedbackComplete from './FeedbackComplete.vue';
+import ServiceComplete from './ServiceComplete.vue';
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const props = defineProps({
     ticketID: {
@@ -75,6 +79,7 @@ const props = defineProps({
 })
 
 const lottieContainer = ref(null)
+const showServiceComplete = ref(true)
 
 onMounted(() => {
     Lottie.loadAnimation({
@@ -141,9 +146,14 @@ const handleAddFeedback = async () => {
 }
 
 onMounted(async() => {
+
     const existingFeedback = await getExistingFeedback(props.ticketID)
     console.log(existingFeedback)
     if(existingFeedback) showCompleted.value = true;
+    else {
+        await delay(2000)
+        showServiceComplete.value = false
+    }
 })
 
 </script>
