@@ -17,7 +17,8 @@ export default {
         'light-gray' : '#F4F7F7',
         'main-gray': '#F4F4F4',
         'label-gray': '#5A5A5A',
-        'custom-red' : '#B62335'
+        'custom-red' : '#B62335',
+        'custom-orange': '#FEB019',
       },
 
       fontFamily: {
