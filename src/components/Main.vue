@@ -1,6 +1,6 @@
 <template>
     <Feedback v-if="ticket.ticketID && ticket.status === 'Completed'" :ticketID = "ticket.ticketID"></Feedback>
-    <div v-if="ticket.ticketID && ticket.status === 'Open'" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl py-10 px-12 md:px-14 md:py-16 overflow-y-auto">
+    <div v-if="ticket.ticketID && ticket.status === 'Open' || ticket.status === 'Serving'" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl py-10 px-12 md:px-14 md:py-16 overflow-y-auto">
         <div class="flex flex-col justify-center items-center w-full min-h-full gap-4 ">
             <!-- Dynamic Icons, Customer and Service Label -->
             <div :class= "ticket.status === 'Completed' ? 'hidden' : 'h-auto w-full block'"
@@ -68,8 +68,18 @@
                 <div ref="lottieContainer" class="w-30 h-24 flex justify-end items-center "></div>
 
                 <!-- Label -->
-                <div class="flex">
-                    <p class="text-center text-sm font-semibold ">We are having our lunch break in 12 minutes</p>
+                <div class="flex w-full">
+                    <Swiper
+                        :slide-per-view="1"
+                        :modules="[Autoplay]"
+                        :autoplay="{ delay: 3000, disableOnInteraction: false}"
+                    >
+                        <SwiperSlide v-for="announcement in announcements" >
+                            <p class="text-center text-sm font-semibold">{{announcement.message}}</p>
+                        </SwiperSlide>
+                        
+                    </Swiper>
+                   
                 </div>
             </div>
 
@@ -80,6 +90,11 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, nextTick} from 'vue';
 import Lottie from 'lottie-web';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Autoplay } from 'swiper/modules';
+
+import 'swiper/css'
+import 'swiper/css/autoplay'
 //Icons
 import TicketFrame from './icons/TicketFrame.vue';
 //JSON
@@ -96,6 +111,7 @@ const selectedService = computed(() => ticket.value.customerType ? ticket.value.
 const services = computed(() => ticket.value.services ? ticket.value.services.map(service => service.serviceName) : [])
 const ticketData = ref({})
 const ticket = computed(() => ticketData.value.ticket || {})
+const announcements = ref([])
 
 const router = useRouter()
 const route = useRoute()
@@ -121,6 +137,26 @@ const getTicket = async (ticketCode) => {
         console.error(err)
     }
 }
+
+const getAnnouncements = async() => {
+    try{
+      let request = `/api/announcement/queue`
+      const response = await fetch(request, { 
+          method: 'GET', 
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      })
+      const data = await response.json()
+      if(!response.ok) return alert(`An error occured: ${data.error}`)
+      return data.announcements
+  }
+  catch(err) {
+      alert(`An error occured: ${err}`)
+  }
+
+}
+
 
 const onCallTicket = (calledTicket, adminType) => {
     // get the called ticket number
@@ -156,6 +192,7 @@ const onHoldTicket = (heldTicket, adminType) => {
         }
     }
 }
+
 const onCompleteTicket = (completeTicket, adminType) => {
     // get the called ticket number
     const ticketNumber = `${completeTicket.adminType}-${completeTicket.ticketNumber}`
@@ -172,6 +209,39 @@ const onCompleteTicket = (completeTicket, adminType) => {
     }
 }
 
+// SOCKET EVENTS HANDLER
+const onCreateAnnouncement = (announcement) => {
+  const ato = announcement.announcedTo
+  if(announcement.status === 'Enabled' && 
+  (ato == 'Queue Monitor')){
+    announcements.value.unshift(announcement)
+    showNewNotification(announcement.message)
+  }
+}
+
+const onUpdateAnnouncement = (announcement) => {
+  console.log('updated', announcement)
+  deleteAnnouncement(announcement.announcementID)
+  const ato = announcement.announcedTo
+  if(announcement.status === 'Enabled' && 
+    (ato == 'Queue Monitor')){
+    announcements.value.unshift(announcement)
+    showNewNotification(announcement.message)
+  }
+}
+
+const onDeleteAnnouncement = (announcementIDs) => {
+  console.log('todelete', announcementIDs)
+  announcementIDs.forEach(a=>{
+    deleteAnnouncement(a)
+  })
+}
+
+const deleteAnnouncement = (id) => {
+  announcements.value = announcements.value.filter(n=>n.announcementID != id)
+}
+
+
 onMounted(async () => {
   
     if(!route.query.tc || route.query.tc === undefined) return 
@@ -179,9 +249,14 @@ onMounted(async () => {
     // fetch client ticket if code is provided 
     ticketData.value = await getTicket(route.query.tc)
     if(ticketData.value){
+        announcements.value = await getAnnouncements()
         socket.on('callTicket', onCallTicket)
         socket.on('holdTicket', onHoldTicket)
         socket.on('completeTicket', onCompleteTicket)
+        socket.on('createAnnouncement', onCreateAnnouncement)
+        socket.on('updateAnnouncement', onUpdateAnnouncement)
+        socket.on('deleteAnnouncement', onDeleteAnnouncement)
+        socket.on('announcementDisabled', (id) => deleteAnnouncement(id))
     }
 
     await nextTick();
@@ -200,7 +275,13 @@ onUnmounted(()=> {
     socket.off('callTicket')
     socket.off('holdTicket')
     socket.off('completeTicket')
+    socket.off('createAnnouncement')
+    socket.off('updateAnnouncement')
+    socket.off('deleteAnnouncement')
+    socket.off('announcementDisabled')
 })
+
+
 
 
 </script>

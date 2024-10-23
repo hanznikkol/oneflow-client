@@ -2,7 +2,7 @@
     <!-- Feedback Complete -->
     <ServiceComplete v-if="showServiceComplete && !showCompleted" />
     <FeedbackComplete v-if="showCompleted"></FeedbackComplete>
-    <div v-if="!showCompleted" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl px-12 py-14 md:px-20 md:py-24 overflow-y-auto">
+    <div v-if="!showServiceComplete && !showCompleted" class="w-full min-h-svh flex justify-center m-auto lg:max-w-xl px-12 py-14 md:px-20 md:py-24 overflow-y-auto">
         <div class="flex flex-col items-center justify-between w-full flex-1 shadow-2xl rounded-lg p-6 gap-4">
             <!-- Logo -->
             <div class=" w-full flex justify-start">
@@ -62,7 +62,7 @@
 </template> 
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 import Lottie from 'lottie-web';
 import feedbackAnimation from '../assets/lottieJSON/feedback.json'
 import ReactionContainer from './subcomponents/ReactionContainer.vue';
@@ -70,7 +70,9 @@ import ButtonContainer from './icons/ButtonContainer.vue';
 import FeedbackComplete from './FeedbackComplete.vue';
 import ServiceComplete from './ServiceComplete.vue';
 
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 const props = defineProps({
     ticketID: {
@@ -80,16 +82,6 @@ const props = defineProps({
 
 const lottieContainer = ref(null)
 const showServiceComplete = ref(true)
-
-onMounted(() => {
-    Lottie.loadAnimation({
-    container: lottieContainer.value, // the ref to attach the animation
-    renderer: 'svg',                  // specify the renderer (svg, canvas, html)
-    loop: true,                       // animation loops indefinitely
-    autoplay: true,                   // start playing on load
-    animationData: feedbackAnimation    // the JSON animation data
-  });
-})
 
 const showCompleted = ref(false)
 const userReaction = ref('');
@@ -145,13 +137,18 @@ const handleAddFeedback = async () => {
     if(created) showCompleted.value = true
 }
 
-onMounted(async() => {
-
+onMounted(async () => {
     const existingFeedback = await getExistingFeedback(props.ticketID)
-    console.log(existingFeedback)
-    if(existingFeedback) showCompleted.value = true;
+    Lottie.loadAnimation({
+        container: lottieContainer.value, // the ref to attach the animation
+        renderer: 'svg',                  // specify the renderer (svg, canvas, html)
+        loop: true,                       // animation loops indefinitely
+        autoplay: true,                   // start playing on load
+        animationData: feedbackAnimation    // the JSON animation data
+    });
+    if(existingFeedback != undefined) showCompleted.value = true;
     else {
-        await delay(2000)
+        await delay(2500)
         showServiceComplete.value = false
     }
 })
